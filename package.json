@@ -1,0 +1,17 @@
+{
+  "name": "partials",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "init": "git clone https://github.com/YotamHassin/partials.git",
+    "install": "npm uninstall tmp --save",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "partials repo",
+  "dependencies": {},
+  "devDependencies": {}
+}
