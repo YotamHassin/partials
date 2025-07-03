@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>שליטה באינדקס עם Hammer.js ולחיצות כפתורים</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        #elementToSwipe {
+            width: 300px;
+            height: 150px;
+            background-color: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: grab;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        button:active {
+            background-color: #1e7e34;
+        }
+        #currentArrayIndex {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .instruction {
+            margin-top: 20px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>שליטה באינדקס המערך</h1>
+    <div id="elementToSwipe">
+        החלק כאן או השתמש בכפתורים
+    </div>
+    <div id="currentArrayIndex">
+        אינדקס נוכחי: 0
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn">הקודם</button>
+        <button id="nextBtn">הבא</button>
+    </div>
+
+    <p class="instruction">החלק על התיבה הכחולה ימינה או שמאלה, או השתמש בכפתורים. לחיצה ממושכת על כפתור תגביר את קצב השינוי.</p>
+
+    <script>
+        // הגדרות
+        const N = 100; // הגודל המקסימלי של המערך (אינדקס מ-0 עד N-1)
+        let currentIdx = 0; // האינדקס הנוכחי במערך
+
+        const elementToSwipe = document.getElementById('elementToSwipe');
+        const currentArrayIndexDisplay = document.getElementById('currentArrayIndex');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // הגדרת Hammer.js
+        const mc = new Hammer(elementToSwipe);
+
+        // אפשר זיהוי מחוות Pan אופקיות בלבד
+        mc.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+
+        // פונקציה לעדכון תצוגת האינדקס
+        function updateDisplay() {
+            currentArrayIndexDisplay.textContent = `אינדקס נוכחי: ${currentIdx}`;
+        }
+
+        // פונקציה לשינוי האינדקס
+        function changeIndex(delta) {
+            currentIdx = Math.min(N - 1, Math.max(0, currentIdx + delta));
+            updateDisplay();
+        }
+
+        // --- טיפול במחוות Pan ---
+        let lastPanDeltaX = 0; // לשמירת השינוי האחרון ב-deltaX עבור זיהוי התחלה חדשה
+
+        mc.on('pan', function (ev) {
+            // אם זו התחלת מחווה חדשה, נאפס את lastPanDeltaX
+            if (ev.isFirst) {
+                lastPanDeltaX = 0;
+            }
+
+            // ההבדל ב-deltaX מאז האירוע הקודם (למידה מדויקת יותר של תזוזה)
+            const displacement = ev.deltaX - lastPanDeltaX;
+            lastPanDeltaX = ev.deltaX;
+
+            // המהירות הכוללת של המחוות בציר ה-X
+            const velocityX = ev.velocityX;
+
+            // קביעת כיוון וגודל השינוי
+            let step = 0;
+            const sensitivity = 5; // ניתן לכוונן את רגישות המהירות
+            const minVelocityThreshold = 0.1; // סף מינימלי למהירות כדי שהשינוי יתרחש
+            const maxStep = 10; // הגודל המקסימלי לשינוי בצעד אחד
+
+            if (Math.abs(velocityX) > minVelocityThreshold) {
+                // לחישוב מודל השינוי, נשתמש ב-velocityX באופן יחסי:
+                // ככל ש-velocityX גבוה יותר, כך ה-step יהיה גדול יותר.
+                // נכפיל ב-sensitivity כדי להגביר את ההשפעה.
+                step = Math.round(Math.abs(velocityX) * sensitivity);
+                step = Math.min(step, maxStep); // הגבלת צעד מקסימלי
+
+                if (velocityX > 0) { // החלקה ימינה
+                    changeIndex(step);
+                } else if (velocityX < 0) { // החלקה שמאלה
+                    changeIndex(-step);
+                }
+            }
+        });
+
+        // --- טיפול בלחיצות כפתורים (לחיצה רגילה ולחיצה ממושכת) ---
+        let holdIntervalId;
+        let acceleration = 1;
+        const initialDelay = 300; // השהייה ראשונית לפני התחלת תאוצה
+        const accelerationRate = 1.2; // קצב התאוצה
+        const maxAccelerationStep = 50; // צעד מקסימלי לתאוצה
+        const intervalTime = 100; // זמן בין עדכוני אינדקס בלחיצה ממושכת
+
+        function startContinuousChange(direction) {
+            // נקה אינטרוול קודם אם קיים
+            if (holdIntervalId) clearInterval(holdIntervalId);
+
+            // לחיצה ראשונה - שינוי ב-1
+            changeIndex(direction);
+
+            // התחל תאוצה לאחר השהייה ראשונית
+            acceleration = 1;
+            holdIntervalId = setTimeout(() => {
+                holdIntervalId = setInterval(() => {
+                    const step = Math.min(Math.round(acceleration), maxAccelerationStep);
+                    changeIndex(direction * step);
+                    acceleration *= accelerationRate;
+                }, intervalTime);
+            }, initialDelay);
+        }
+
+        function stopContinuousChange() {
+            clearInterval(holdIntervalId);
+            holdIntervalId = null;
+            acceleration = 1; // איפוס תאוצה
+        }
+
+        // אירועי עכבר עבור כפתורים
+        prevBtn.addEventListener('mousedown', () => startContinuousChange(-1));
+        nextBtn.addEventListener('mousedown', () => startContinuousChange(1));
+
+        prevBtn.addEventListener('mouseup', stopContinuousChange);
+        nextBtn.addEventListener('mouseup', stopContinuousChange);
+
+        prevBtn.addEventListener('mouseleave', stopContinuousChange);
+        nextBtn.addEventListener('mouseleave', stopContinuousChange);
+
+        // אירועי מקלדת עבור כפתורים (אופציונלי: חצים ימינה ושמאלה)
+        document.addEventListener('keydown', (ev) => {
+            // מונע לחיצה חוזרת כשמקש מוחזק
+            if (ev.repeat) return;
+
+            if (ev.key === 'ArrowRight') {
+                startContinuousChange(1);
+            } else if (ev.key === 'ArrowLeft') {
+                startContinuousChange(-1);
+            }
+        });
+
+        document.addEventListener('keyup', (ev) => {
+            if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') {
+                stopContinuousChange();
+            }
+        });
+
+
+        // עדכון תצוגה ראשוני
+        updateDisplay();
+    </script>
+</body>
+</html>
