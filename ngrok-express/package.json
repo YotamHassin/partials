@@ -1,0 +1,23 @@
+{
+  "name": "ngrok-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "i": "npm i -s ngrok express nodemon",
+    "ngrok": "ngrok http 3000",
+    "index": "nodemon index",
+    "start": "node devApp"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ngrok": "^3.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}

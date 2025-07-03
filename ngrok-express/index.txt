@@ -1,0 +1,5 @@
+// https://medium.com/dev-genius/giving-public-access-to-your-node-application-using-ngrok-3587c8064709
+// https://dev.to/vonagedev/enny-stack-the-express-ngrok-and-nodemon-stack-23j
+
+npm i -s ngrok express nodemon
+
