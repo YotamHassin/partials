@@ -1,0 +1,93 @@
+/* https://stackoverflow.com/questions/47541645/bootstrap-media-breakpoints */
+
+/*==========  Mobile First Method  ==========*/
+/* 
+<div id="mobile-first">mobile-first</div>
+<div id="non-mobile-first">non-mobile-first</div>
+*/
+
+/* Custom, iPhone Retina */
+@media only screen and (min-width : 320px) {
+    #mobile-first:before {
+        display: table;
+        content: "min-width : 320px, Custom, iPhone Retina";
+    }
+}
+
+/* Extra Small Devices, Phones */
+@media only screen and (min-width : 480px) {
+    #mobile-first:before {
+        display: table;
+        content: "min-width : 480px, Extra Small Devices, Phones";
+    }
+}
+
+/* Small Devices, Tablets */
+@media only screen and (min-width : 768px) {
+    #mobile-first:before {
+        display: table;
+        content: "min-width : 768px, Small Devices, Tablets";
+    }
+}
+
+/* Medium Devices, Desktops */
+@media only screen and (min-width : 992px) {
+    #mobile-first:before {
+        display: table;
+        content: "min-width : 992px, Medium Devices, Desktops";
+    }
+}
+
+/* Large Devices, Wide Screens */
+@media only screen and (min-width : 1200px) {
+    #mobile-first:before {
+        display: table;
+        content: "min-width : 1200px, Large Devices, Wide Screens";
+    }
+}
+
+/*==========  Non-Mobile First Method  ==========*/
+#non-mobile-first:before {
+    display: table;
+    content: "over max-width : 1200px, X Large Devices, Wide Screens";
+}
+
+/* Large Devices, Wide Screens */
+@media only screen and (max-width : 1200px) {
+    #non-mobile-first:before {
+        display: table;
+        content: "max-width : 1200px, Large Devices, Wide Screens";
+    }
+}
+
+/* Medium Devices, Desktops */
+@media only screen and (max-width : 992px) {
+    #non-mobile-first:before {
+        display: table;
+        content: "max-width : 992px, Medium Devices, Desktops";
+    }
+}
+
+/* Small Devices, Tablets */
+@media only screen and (max-width : 768px) {
+    #non-mobile-first:before {
+        display: table;
+        content: "max-width : 768px, Small Devices, Tablets";
+    }
+}
+
+/* Extra Small Devices, Phones */
+@media only screen and (max-width : 480px) {
+    #non-mobile-first:before {
+        display: table;
+        content: "max-width : 480px, Extra Small Devices, Phones";
+    }
+}
+
+/* Custom, iPhone Retina */
+@media only screen and (max-width : 320px) {
+    #non-mobile-first:before {
+        display: table;
+        content: "max-width : 320px, Custom, iPhone Retina";
+    }
+}
