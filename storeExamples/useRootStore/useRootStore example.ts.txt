@@ -1,0 +1,72 @@
+
+
+// --- דוגמה לשימוש (ניתן להריץ בסביבת Node.js או בדפדפן) ---
+
+import { useRootStore } from "./useRootStore";
+
+
+// ייצוא ה-hooks הראשיים לשימוש נוח
+export const {
+  userStore,
+  // UseBoundStore<StoreApi<ProductStore>> vs StoreApi<ProductStore>
+  // UseBoundStore suppurts reactive updates, deepstate changes, etc.
+  productStore: useProductStore,
+  
+  lastDataLoad,
+  initializeListeners,
+  exportAllStoresToJson,
+  importAllStoresFromJson
+} = useRootStore();
+
+export const {
+  username,
+  login,
+  logout
+} = userStore();
+export const {
+  products,
+  addProduct,
+  removeProduct
+} = useProductStore();
+
+
+
+// --- הדגמה ---
+
+// 1. אתחול מאזינים (אם רוצים)
+initializeListeners();
+
+// 2. מבצעים שינויים כלשהם ב-stores
+console.log("\n--- Initial State ---");
+console.log("User:", userStore.getState());
+console.log("Products:", useProductStore.getState());
+
+login("Alice");
+addProduct("Monitor");
+logout();
+
+console.log("\n--- State After Changes ---");
+console.log("User:", userStore.getState());
+console.log("Products:", useProductStore.getState());
+
+// 3. ייצוא המצב הנוכחי ל-JSON
+const allStoresJson = exportAllStoresToJson();
+console.log("\n--- Exported JSON ---");
+console.log(allStoresJson);
+
+// 4. מדמים "איפוס" או טעינה מחדש של ה-stores (לדוגמה, בטעינת דף)
+userStore.setState({ username: 'Reset User', isLoggedIn: true });
+useProductStore.setState({ products: ['Reset Product'], lastUpdate: new Date() });
+
+console.log("\n--- State After Reset ---");
+console.log("User:", userStore.getState());
+console.log("Products:", useProductStore.getState());
+
+
+// 5. ייבוא הנתונים מה-JSON ששמרנו קודם
+importAllStoresFromJson(allStoresJson);
+
+console.log("\n--- State After Import ---");
+console.log("User:", userStore.getState());
+console.log("Products:", useProductStore.getState());
+console.log("RootStore lastDataLoad:", lastDataLoad);
