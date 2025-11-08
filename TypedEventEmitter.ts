@@ -111,6 +111,18 @@ export class TypedEventEmitter<
   }
 }
 
+type AppEvents1 = {
+  // single string param
+  dataReceived: { message: string };
+  
+  // object param
+  userUpdated: { user: { id: string; name: string } };
+  
+  // multiple params example
+  progress: { percent: number, status: string };
+
+  userLoggedIn: { event: { name: string } };
+};
 
 // Define your app-specific events and their parameter tuple types
 type AppEvents = {
