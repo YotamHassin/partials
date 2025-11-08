@@ -15,6 +15,32 @@ const emitterBasicExample = () => {
   emitter.emit("dataReceived", "User profile loaded");
 };
 
+
+const customEventExample = () => {
+  const userEvent = new CustomEvent("userLoggedIn", {
+    detail: { name: "Alice" },
+  });
+
+  document.addEventListener("userLoggedIn", (e: any) => {
+    console.log(`Welcome, ${e.detail.name}!`);
+  });
+
+  document.dispatchEvent(userEvent);
+};
+
+const documentDispatchEvent = (event: Event) => {
+  // Simple event, matches built-in DOM event.
+  const DOMContentLoadedEvent = new CustomEvent("DOMContentLoaded", event);
+
+  // Example with wrong data type
+  const DOMContentMyData = new CustomEvent("DOMContentLoaded", {
+    detail: { myData: "Some data here" },
+  });
+
+  document.dispatchEvent(DOMContentLoadedEvent);
+  document.dispatchEvent(DOMContentMyData);
+};
+
 // Define a mapping from event names to their argument types
 export type EventMap = Record<string, any[]>;
 
@@ -90,3 +116,4 @@ emitter.emit("progress", 42, "halfway");
 
 // If you try to use an incorrect shape the compiler will complain:
 // emitter.emit('dataReceived', 123); // Error: Argument of type 'number' is not assignable to parameter of type 'string'.
+
