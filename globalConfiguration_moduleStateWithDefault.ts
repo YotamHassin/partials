@@ -8,8 +8,8 @@ const defaultIdGenerator: IdGenerator = () =>
 
 let idGenerator: IdGenerator = defaultIdGenerator;
 
-export const setCustomIdGenerator = (generator: IdGenerator = defaultIdGenerator) => {
-  idGenerator = generator;
+export const setCustomIdGenerator = (generator?: IdGenerator) => {
+  idGenerator = generator || defaultIdGenerator;
 };
 
 export const generateId: IdGenerator = (): Id => idGenerator();
