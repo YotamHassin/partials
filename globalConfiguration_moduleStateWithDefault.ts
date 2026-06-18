@@ -13,3 +13,22 @@ export const setCustomIdGenerator = (generator: IdGenerator = defaultIdGenerator
 };
 
 export const generateId: IdGenerator = (): Id => idGenerator();
+
+export class IdManager {
+  private generator: IdGenerator;
+
+  constructor(customGenerator?: IdGenerator) {
+    // ברירת מחדל אם לא סופק גנרטור מותאם אישית
+    this.generator = customGenerator || defaultIdGenerator;
+  }
+
+  // יצירת ID לפי הגנרטור של המופע הספציפי הזה
+  public generate(): Id {
+    return this.generator();
+  }
+
+  // אפשרות להחליף את הגנרטור של המופע הנוכחי בלבד
+  public setGenerator(generator: IdGenerator): void {
+    this.generator = generator;
+  }
+}
